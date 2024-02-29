@@ -1,0 +1,6 @@
+module(name = "salvo", version="")
+
+
+bazel_dep(name = "protobuf", version = "21.7", repo_name = "com_google_protobuf")
+bazel_dep(name = "rules_python", version = "0.4.0")
+# -- bazel_dep definitions -- #
