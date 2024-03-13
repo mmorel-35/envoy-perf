@@ -1,6 +1,6 @@
 module(
     name = "salvo-remote",
-    version = "",
+    version = "0.0.0",
 )
 
 bazel_dep(name = "gazelle", version = "0.30.0", dev_dependency = True, repo_name = "bazel_gazelle")
