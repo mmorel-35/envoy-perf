@@ -1,0 +1,70 @@
+name: Salvo Build and Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'salvo/**'
+      - '.github/workflows/salvo-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'salvo/**'
+      - '.github/workflows/salvo-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build-workspace-mode:
+    name: Build (WORKSPACE mode)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.9.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            build --enable_bzlmod=false
+
+      - name: Build with WORKSPACE
+        working-directory: salvo
+        run: bazel build --enable_bzlmod=false //...
+
+      - name: Test with WORKSPACE
+        working-directory: salvo
+        run: bazel test --enable_bzlmod=false //...
+
+  build-bzlmod-mode:
+    name: Build (bzlmod mode)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.9.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          bazelrc: |
+            build --enable_bzlmod=true
+            build --lockfile_mode=error
+
+      - name: Verify lock file is up to date
+        working-directory: salvo
+        run: |
+          bazel mod graph > /dev/null
+          git diff --exit-code MODULE.bazel.lock || (echo "MODULE.bazel.lock is out of date. Please run 'bazel mod graph' and commit the updated lock file." && exit 1)
+
+      - name: Build with bzlmod
+        working-directory: salvo
+        run: bazel build --enable_bzlmod=true --lockfile_mode=error //...
+
+      - name: Test with bzlmod
+        working-directory: salvo
+        run: bazel test --enable_bzlmod=true --lockfile_mode=error //...
