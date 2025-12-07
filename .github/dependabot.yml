@@ -15,3 +15,11 @@ updates:
   directory: /salvo
   schedule:
     interval: weekly
+- package-ecosystem: bazel
+  directory: /salvo
+  schedule:
+    interval: weekly
+- package-ecosystem: bazel
+  directory: /salvo-remote
+  schedule:
+    interval: weekly
