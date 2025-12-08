@@ -1,0 +1,2 @@
+# This file marks the root of the Bazel workspace with bzlmod enabled.
+# See MODULE.bazel for dependencies.
